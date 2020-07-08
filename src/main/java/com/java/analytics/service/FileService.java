@@ -7,7 +7,9 @@ import com.java.analytics.domain.Sale;
 import com.java.analytics.domain.Salesman;
 import com.java.analytics.dto.ProcessDTO;
 import com.java.analytics.utils.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -16,14 +18,27 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Service
+@Slf4j
 public class FileService  {
 
-    SalesmanService SalesmanService = new SalesmanService();
-    ClientService clientService = new ClientService();
-    SaleServiceImpl saleService = new SaleServiceImpl();
+    @Autowired
+    SalesmanService SalesmanService;
+    @Autowired
+    ClientService clientService;
+    @Autowired
+    SaleServiceImpl saleService;
 
+
+    public boolean save(byte[] file) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(Thread.currentThread().getContextClassLoader().getResource(Constants.PATH).getPath() + new Random().nextInt(10000)+Constants.EXT)) {
+            fos.write(file);
+            return true;
+        }
+
+    }
 
     public File[] stackFiles(String path) {
         URL url = Thread.currentThread().getContextClassLoader().getResource(path);
