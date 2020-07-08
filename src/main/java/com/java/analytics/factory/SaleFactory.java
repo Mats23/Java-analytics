@@ -12,22 +12,15 @@ public class SaleFactory {
 
 
     public static Sale create(List<String> saleItem, List<Salesman> salesmanList) {
-        Optional<Salesman> salesman =salesmanList.stream().filter(sm -> sm.getName().equals(saleItem.get(3))).findFirst();
+        Sale sale = Sale.builder()
+                    .id(saleItem.get(0))
+                    .idSale(saleItem.get(1))
+                    .saleItem(SaleItemFactory.create(saleItem.get(2)))
+                    .build();
+        salesmanList.stream().filter(sm -> sm.getName().equals(saleItem.get(3))).findFirst().ifPresent(sale::setSalesman);
+        return sale;
 
-        if (salesman.isPresent()) {
-            return Sale.builder()
-                    .id(saleItem.get(0))
-                    .idSale(saleItem.get(1))
-                    .saleItem(SaleItemFactory.create(saleItem.get(2)))
-                    .salesman(salesman.get())
-                    .build();
-        } else {
-            return  Sale.builder()
-                    .id(saleItem.get(0))
-                    .idSale(saleItem.get(1))
-                    .saleItem(SaleItemFactory.create(saleItem.get(2)))
-                    .build();
-        }
+
 
     }
 }

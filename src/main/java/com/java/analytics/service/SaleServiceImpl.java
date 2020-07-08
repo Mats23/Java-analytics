@@ -4,7 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.java.analytics.domain.Sale;
 import com.java.analytics.domain.Salesman;
-import com.java.analytics.enums.Type;
+import com.java.analytics.enums.TypeEnum;
 import com.java.analytics.factory.SaleFactory;
 import com.java.analytics.utils.Partition;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class SaleServiceImpl implements SaleService<Sale, String,Salesman> {
         List<List<String>> list = Partition.execute(stringList);
         List<Sale> saleList = new ArrayList<>();
         list.forEach(a -> {
-            if (a.contains(Type.SALE.getValue())) {
+            if (a.contains(TypeEnum.SALE.getValue())) {
                 Sale sale = SaleFactory.create(a, salesmanList);
                 saleList.add(sale);
             }

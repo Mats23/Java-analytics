@@ -1,7 +1,7 @@
 package com.java.analytics.service;
 
 import com.java.analytics.domain.Client;
-import com.java.analytics.enums.Type;
+import com.java.analytics.enums.TypeEnum;
 import com.java.analytics.factory.ClientFactory;
 import com.java.analytics.utils.Partition;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class ClientService implements Process<Client, String> {
         List<List<String>> list = Partition.execute(stringList);
         List<Client> clientList = new ArrayList<>();
         list.forEach(a -> {
-            if (a.contains(Type.CLIENT.getValue())) {
+            if (a.contains(TypeEnum.CLIENT.getValue())) {
                 Client client = ClientFactory.create(a);
                 clientList.add(client);
             }

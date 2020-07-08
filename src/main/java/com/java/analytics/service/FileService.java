@@ -8,17 +8,13 @@ import com.java.analytics.domain.Salesman;
 import com.java.analytics.dto.ProcessDTO;
 import com.java.analytics.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -33,7 +29,7 @@ public class FileService  {
 
 
     public boolean save(byte[] file) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(Thread.currentThread().getContextClassLoader().getResource(Constants.PATH).getPath() + new Random().nextInt(10000)+Constants.EXT)) {
+        try (FileOutputStream fos = new FileOutputStream(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(Constants.PATH)).getPath() + new Random().nextInt(10000)+Constants.EXTENSION)) {
             fos.write(file);
             return true;
         }
@@ -42,13 +38,13 @@ public class FileService  {
 
     public File[] stackFiles(String path) {
         URL url = Thread.currentThread().getContextClassLoader().getResource(path);
-        FilenameFilter fileFilter = (dir,filename) -> filename.toLowerCase().endsWith(Constants.EXT);
-        return new File(url.getPath()).listFiles(fileFilter);
+        FilenameFilter fileFilter = (dir,filename) -> filename.toLowerCase().endsWith(Constants.EXTENSION);
+        return new File(Objects.requireNonNull(url).getPath()).listFiles(fileFilter);
 
     }
 
 
-    public List<String> processString(BufferedReader br) throws IOException {
+    public List<String> processString(BufferedReader br) {
         return separeteLines(br);
 
     }
@@ -64,12 +60,11 @@ public class FileService  {
     public Map<String, String>  bestSaleAndWorseSaleman(List<Sale> saleList) {
         return saleService.calculateSale(saleList);
     }
-    public ExitStatus writer(ProcessDTO processDTO) {
+    public void writer(ProcessDTO processDTO) {
         String filePath = String.format("src/main/resources/data/out/%s.done.dat", processDTO.getDone()) ;
         File file = new File(filePath);
 
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
-
 
             writer.append(String.format("Salesman: %s", processDTO.getSalesmanList().size()));
             writer.append(System.lineSeparator());
@@ -79,29 +74,14 @@ public class FileService  {
             writer.append(System.lineSeparator());
             writer.append(String.format("ID Worse Salesman: %s", processDTO.getBestSaleAndWorseSaleman().get("less")));
 
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-            return ExitStatus.FAILED;
-
+            log.error(e.getMessage(),e);
         }
-
-        return ExitStatus.COMPLETED;
-
     }
 
     private List<String> separeteLines(BufferedReader br) {
         final List<String> stringList = new ArrayList<>();
-        br.lines().forEach(a -> {
-
-            String[] lines = a.split("ç");
-            for (String line : lines) {
-                stringList.add(line);
-            }
-        });
-
-
+        br.lines().forEach(a -> stringList.addAll(Arrays.asList(a.split("ç"))));
         return stringList;
     }
 

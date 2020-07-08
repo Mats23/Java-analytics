@@ -4,5 +4,5 @@ public class Constants {
 
 
     public final static String PATH = "data/in/";
-    public final static String EXT = ".dat";
+    public final static String EXTENSION = ".dat";
 }
